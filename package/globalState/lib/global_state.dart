@@ -31,4 +31,13 @@ class GlobalState extends Model {
     _counters.removeAt(index);
     notifyListeners();
   }
+
+  void reorderCounter(int oldIndex, int newIndex) {
+    if (oldIndex != newIndex) {
+      final item = _counters.removeAt(oldIndex);
+      _counters.insert(newIndex, item);
+      notifyListeners();
+    }
+  }
+
 }

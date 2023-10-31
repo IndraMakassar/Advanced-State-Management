@@ -9,14 +9,16 @@ void main() {
 class MyApp extends StatelessWidget {
   final GlobalState model = GlobalState();
 
+  MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ScopedModel<GlobalState>(
         model: model,
         child: MaterialApp(
           home: Scaffold(
-            appBar: AppBar(title: Text('Stateful Counter App')),
-            body: SingleChildScrollView(
+            appBar: AppBar(title: const Text('Stateful Counter App')),
+            body: const SingleChildScrollView(
               child: Column(
                 children: <Widget>[
                   CounterList(),
@@ -29,6 +31,8 @@ class MyApp extends StatelessWidget {
 }
 
 class CounterList extends StatelessWidget {
+  const CounterList({super.key});
+
   @override
   Widget build(BuildContext context) {
     final GlobalState model =
@@ -39,13 +43,16 @@ class CounterList extends StatelessWidget {
           onPressed: () {
             model.addCounter();
           },
-          child: Text('Add Counter'),
+          child: const Text('Add Counter'),
         ),
-        ListView.builder(
+        ReorderableListView.builder(
           itemCount: model.counters.length,
           shrinkWrap: true,
           itemBuilder: (context, index) {
-            return CounterWidget(index: index);
+            return CounterWidget(index: index, key: ValueKey(index));
+          },
+          onReorder: (int oldIndex, int newIndex) {
+            model.reorderCounter(oldIndex, newIndex);
           },
         ),
       ],
@@ -55,36 +62,66 @@ class CounterList extends StatelessWidget {
 
 class CounterWidget extends StatelessWidget {
   final int index;
+  final Key key;
 
-  CounterWidget({required this.index});
+  CounterWidget({required this.index, required this.key});
 
   @override
   Widget build(BuildContext context) {
     final GlobalState model =
         ScopedModel.of<GlobalState>(context, rebuildOnChange: true);
-    return Center(
+    return Card(
+      key: key,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          Text('Value: ${model.counters[index]}'),
-          SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: () {
-              model.incrementCounter(index);
-            },
-            child: Text('Increment'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              model.decrementCounter(index);
-            },
-            child: Text('Decrement'),
-          ),
-          ElevatedButton(
-              onPressed: () {
-                model.removeCounter(index);
-              },
-              child: Text("remove"))
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text('Counter: $index'),
+                  Text('Value: ${model.counters[index]}'),
+                ],
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      ElevatedButton(
+                        onPressed: () {
+                          model.incrementCounter(index);
+                        },
+                        child: const Text('Increment'),
+                      ),
+                      const SizedBox(
+                        width: 8,
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          model.decrementCounter(index);
+                        },
+                        child: const Text('Decrement'),
+                      ),
+                      const SizedBox(
+                        width: 8,
+                      ),
+                      ElevatedButton(
+                          onPressed: () {
+                            model.removeCounter(index);
+                          },
+                          child: const Text("remove")),
+                      const SizedBox(
+                        width: 40,
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ],
+          )
         ],
       ),
     );
