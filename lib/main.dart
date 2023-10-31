@@ -16,10 +16,12 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           home: Scaffold(
             appBar: AppBar(title: Text('Stateful Counter App')),
-            body: Column(
-              children: <Widget>[
-                CounterList(),
-              ],
+            body: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  CounterList(),
+                ],
+              ),
             ),
           ),
         ));
